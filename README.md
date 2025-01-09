@@ -25,18 +25,10 @@ This script generates a CSV file containing the top 50 most searched automotive-
 
 4. Update the script with your Gmail address and Gmail App Password:
 
-Open [index.js] and replace`'Your_gmail_address'` with your gmail address you want to use as sender gmail and `'YOUR_APP_PASSWORD'` with your gmail App Password
+Open .env and replace`'GMAIL_USER'` with your gmail address you want to use as sender gmail and `'GMAIL_PASS'` with your gmail App Password
 Note: The gmail app password can be goten by going to google account management dashboard and searching "app password" and click on it and follow the wizard to generate your app password (if you wish to send the email from your gmail)
 
-    ```javascript
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'Your_gmail_address',// Replace with your gmail address
-        pass: 'YOUR_APP_PASSWORD' // Replace with your App Password
-      }
-    });
-    ```
+
 
 ## Usage
 
