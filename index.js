@@ -42,7 +42,7 @@ const sendEmail = (csvFilePath) => {
 const generateAndSendCSV = () => {
   axios.post('https://ai.quivox.org/api/quiva-x-advanced/generate-response', 
     {
-      prompt: 'individually generate top 50 most searched automotive related keywords and hashtags on Meta(facebook&instagram), craigslist and tiktok, making sure your response in a format that can be parsed into CSV correctly, Make sure the actual response data matches this structure for the code to work correctly. structure {"Meta":[{"Keyword":"autmotive repair","Hashtag":"#automotiverepair"},{"Keyword":"automotive parts","Hashtag":"#automotiveparts"},...],"Craigslist":[{"Keyword":"automotive jobs"},{"Keyword":"automotive paints"},...],"TikTok":[{"Keyword":"walmart automotive","Hashtag":"#automotivetechnician"},{"Keyword":"automotive shops","Hashtag":"#coxautomotive"},...]}. Please make sure its up to 50* keywords and hastags for each of meta(instagram and facebook), craigslist and tiktok',
+      prompt: 'generate top 50* most searched automotive related keywords and hashtags on Meta(facebook&instagram), craigslist and tiktok. Please Make sure your response exactly matches this format:{"Meta":[{"Keyword":"automotive parts","Hashtag":"#automotiveparts","USA_CST":"high","Canada_CST":"medium"},{"Keyword":"automotive repairs","Hashtag":"#automotiverepair","USA_CST":"medium","Canada_CST":"low"},...],"Craigslist":[{"Keyword":"automotive jobs","USA_CST":"medium","Canada_CST":"low"},{"Keyword":"automotive paint","USA_CST":"high","Canada_CST":"medium"},...],"TikTok":[{"Keyword":"walmart automotive","Hashtag":"#automotiveshop","USA_CST":"high","Canada_CST":"medium"},{"Keyword":"automotive industry","Hashtag":"#automotivetechnician","USA_CST":"medium","Canada_CST":"low"},...]}',
       username: 'nueralmage'
     },
     {
@@ -53,31 +53,38 @@ const generateAndSendCSV = () => {
   )
   .then(response => {
     const data = response.data;
+    console.log('Data:', data);
 
     const metaData = data.Meta.map((item, index) => ({
       Platform: 'Meta (Facebook & Instagram)',
       Rank: index + 1,
       Keyword: item.Keyword,
-      Hashtag: item.Hashtag
+      Hashtag: item.Hashtag,
+      USA_CST: item.USA_CST,
+      Canada_CST: item.Canada_CST
     }));
 
     const craigslistData = data.Craigslist.map((item, index) => ({
       Platform: 'Craigslist',
       Rank: index + 1,
       Keyword: item.Keyword,
-      Hashtag: ''
+      Hashtag: '',
+      USA_CST: item.USA_CST,
+      Canada_CST: item.Canada_CST
     }));
 
     const tiktokData = data.TikTok.map((item, index) => ({
       Platform: 'TikTok',
       Rank: index + 1,
       Keyword: item.Keyword,
-      Hashtag: item.Hashtag
+      Hashtag: item.Hashtag,
+      USA_CST: item.USA_CST,
+      Canada_CST: item.Canada_CST
     }));
 
     const combinedData = [...metaData, ...craigslistData, ...tiktokData];
 
-    const fields = ['Platform', 'Rank', 'Keyword', 'Hashtag'];
+    const fields = ['Platform', 'Rank', 'Keyword', 'Hashtag', 'USA_CST', 'Canada_CST'];
     const opts = { fields };
     const parser = new Parser(opts);
     const csv = parser.parse(combinedData);
@@ -97,5 +104,5 @@ const generateAndSendCSV = () => {
   });
 };
 
-// Schedule the task to run every 5 minutes
-cron.schedule('*/5 * * * *', generateAndSendCSV);
+// Schedule the task to run every hour
+cron.schedule('0 * * * *', generateAndSendCSV);
