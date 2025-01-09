@@ -42,7 +42,7 @@ const sendEmail = (csvFilePath) => {
 const generateAndSendCSV = () => {
   axios.post('https://ai.quivox.org/api/quiva-x-advanced/generate-response', 
     {
-      prompt: 'individually generate top 50 most searched automotive related keywords and hashtags on Meta(facebook&instagram), craigslist and tiktok, making sure your response in a format that can be parsed into CSV correctly, Make sure the actual response data matches this structure for the code to work correctly. structure {"Meta":[{"Keyword":"Cars","Hashtag":"#cars"},{"Keyword":"Trucks","Hashtag":"#trucks"},...],"Craigslist":[{"Keyword":"Cars & Trucks"},{"Keyword":"Used Cars & Trucks"},...],"TikTok":[{"Keyword":"Cars","Hashtag":"#cars"},{"Keyword":"CarTok","Hashtag":"#cartok"},...]}. Please make sure its up to 50* keywords and hastags for each of meta(instagram and facebook), craigslist and tiktok',
+      prompt: 'individually generate top 50 most searched automotive related keywords and hashtags on Meta(facebook&instagram), craigslist and tiktok, making sure your response in a format that can be parsed into CSV correctly, Make sure the actual response data matches this structure for the code to work correctly. structure {"Meta":[{"Keyword":"autmotive repair","Hashtag":"#automotiverepair"},{"Keyword":"automotive parts","Hashtag":"#automotiveparts"},...],"Craigslist":[{"Keyword":"automotive jobs"},{"Keyword":"automotive paints"},...],"TikTok":[{"Keyword":"walmart automotive","Hashtag":"#automotivetechnician"},{"Keyword":"automotive shops","Hashtag":"#coxautomotive"},...]}. Please make sure its up to 50* keywords and hastags for each of meta(instagram and facebook), craigslist and tiktok',
       username: 'nueralmage'
     },
     {
