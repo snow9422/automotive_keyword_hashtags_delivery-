@@ -23,7 +23,9 @@ jobs:
 
     - name: Run script
       run: node index.js
-
+    - name: Set environment variable
+      run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+      
     - name: Archive CSV files
       uses: actions/upload-artifact@v3
       with:
