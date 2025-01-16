@@ -12,10 +12,12 @@ const transporter = nodemailer.createTransport({
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS,
   },
+  debug: true, // Enable debug output
+  logger: true, // Log SMTP communication
 });
 
 // Function to send email
-const sendEmail = (csvFilePath) => {
+const sendEmail = async (csvFilePath) => {
   const mailOptions = {
     from: process.env.GMAIL_USER,
     to: 'tobirammar@gmail.com, basiuk94n@gmail.com, chris@chriswhaley.com',
@@ -29,19 +31,29 @@ const sendEmail = (csvFilePath) => {
     ],
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent:', info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.response);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
 };
 
 // Function to fetch data from ChatGPT and generate CSV
 async function generateAndSendCSV() {
   const prompt = `
-Generate the top 25 most searched automotive-related keywords and hashtags for Meta (Facebook & Instagram), Craigslist, and TikTok. Include the following fields: - "Meta": [{"Keyword": "...", "Hashtag": "...", "USA_CST": "...", "Canada_CST": "..."}, ...] - "Craigslist": [{"Keyword": "...", "USA_CST": "...", "Canada_CST": "..."}, ...] - "TikTok": [{"Keyword": "...", "Hashtag": "...", "USA_CST": "...", "Canada_CST": "..."}, ...] Notes: 1. Provide exactly 25 entries per platform. 2. Use "high", "medium", or "low" for USA_CST and Canada_CST values. 3. Return only valid JSON. Do not include ellipses or additional text in your response. Please dont include anything other than the json in your response. You must only return the json without any text in the response(very important) Please make sure you fill the response with automotive-specific keywords tailored for the automotive industry. The returned format should include terms such as automotive parts, automotive repair, auto shop, automotive engineer, car tuning, automotive engineering, vehicle maintenance, car modification, engine repair, auto diagnostics, performance tuning, car restoration, auto mechanic, body shop, car detailing, and similar niche-specific terms. Ensure the keywords are closely tied to the automotive sector and not too broad like 'cars' or 'trucks`;
+    Generate the top 30 most searched automotive-related keywords and hashtags for Meta (Facebook & Instagram), Craigslist, and TikTok.
+    Include the following fields:
+    - "Meta": [{"Keyword": "...", "Hashtag": "...", "USA_CST": "...", "Canada_CST": "..."}, ...]
+    - "Craigslist": [{"Keyword": "...", "USA_CST": "...", "Canada_CST": "..."}, ...]
+    - "TikTok": [{"Keyword": "...", "Hashtag": "...", "USA_CST": "...", "Canada_CST": "..."}, ...]
+    Notes:
+    1. Provide exactly 30 entries per platform.
+    2. Use "high", "medium", or "low" for USA_CST and Canada_CST values.
+    3. Return only valid JSON. Do not include ellipses or additional text in your response.
+    Please make sure you fill the response with automotive-specific keywords tailored for the automotive industry.
+    Ensure the keywords are closely tied to the automotive sector and not too broad like 'cars' or 'trucks'.
+  `;
 
   try {
     const response = await axios.post(
@@ -52,7 +64,7 @@ Generate the top 25 most searched automotive-related keywords and hashtags for M
           { role: 'system', content: 'You are a helpful assistant.' },
           { role: 'user', content: prompt },
         ],
-        max_tokens: 3000, // Allow more tokens for a larger response
+        max_tokens: 3000,
         temperature: 0.7,
       },
       {
@@ -64,7 +76,7 @@ Generate the top 25 most searched automotive-related keywords and hashtags for M
     );
 
     const data = JSON.parse(response.data.choices[0].message.content);
-    console.log(data)
+    console.log(data);
 
     if (!data.Meta || !data.Craigslist || !data.TikTok) {
       console.error('Invalid API response structure');
